@@ -1,8 +1,8 @@
 const passport = require("passport");
 const LocalStrategy = require("passport-local");
-const connection = require("./database");
 const validPassword = require("../lib/passwordUtils").validPassword;
-const User = connection.models.User;
+const sqlite3 = require("sqlite3");
+const db = new sqlite3.Database("./var/db/todos.db");
 
 const customFields = {
   usernameField: "uname",
@@ -10,23 +10,24 @@ const customFields = {
 };
 
 const verifyCallback = (username, password, done) => {
-  User.findOne({ username: username })
-    .then((user) => {
-      if (!user) {
+  db.get(
+    "SELECT * FROM users WHERE username =?",
+    [username],
+    function (err, row) {
+      if (err) {
+        return done(err);
+      }
+      if (!row) {
         return done(null, false);
       }
-
-      const isValid = validPassword(password, user.hash, user.salt);
-
+      const isValid = validPassword(password, row.hashed_password, row.salt);
       if (isValid) {
-        return done(null, user);
+        done(null, row);
       } else {
         return done(null, false);
       }
-    })
-    .catch((err) => {
-      return done(err);
-    });
+    }
+  );
 };
 
 const strategy = new LocalStrategy(customFields, verifyCallback);
@@ -38,7 +39,7 @@ passport.serializeUser((user, done) => {
 });
 
 passport.deserializeUser((userId, done) => {
-  User.findById(userId).then((user) => {
+  db.get("SELECT * FROM users WHERE id =?", [userId], function () {
     done(null, userId);
   });
 });

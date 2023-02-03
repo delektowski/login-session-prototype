@@ -1,9 +1,9 @@
 const router = require("express").Router();
 const passport = require("passport");
 const genPassword = require("../lib/passwordUtils").genPassword;
-const connection = require("../config/database");
-const User = connection.models.User;
-const { isAuth, isAdmin } = require("./authMiddleware");
+const sqlite3 = require("sqlite3");
+const db = new sqlite3.Database("./var/db/todos.db");
+const { isAuth } = require("./authMiddleware");
 
 router.post(
   "/login",
@@ -13,39 +13,40 @@ router.post(
   })
 );
 
-router.post("/register", (req, res, next) => {
+router.post("/register", (req, res) => {
   const saltHash = genPassword(req.body.pw);
 
   const salt = saltHash.salt;
   const hash = saltHash.hash;
 
-  const newUser = new User({
-    username: req.body.uname,
-    hash,
-    salt,
-    admin: true,
-  });
-
-  newUser
-    .save()
-    .then((user) => {
+  db.run(
+    "INSERT INTO users (username, hashed_password, salt) VALUES (?, ?, ?)",
+    [req.body.uname, hash, salt],
+    () => {
       res.send({
-        message: `You successfully registered a user: ${user.username}`,
+        message: `You successfully registered a user: ${req.body.uname}`,
         status: 200,
         isRegistered: true,
       });
-    })
-    .catch((err) => {
-      console.log("Register error:", err);
-      res.send({
-        message: `Something went wrong.`,
-        status: 500,
-        isRegistered: false,
-      });
-    });
+    }
+  );
 });
 
-router.get("/protected-route", isAuth, (req, res, next) => {
+router.get("/logout", function (req, res, next) {
+  req.logout(function (err) {
+    if (err) {
+      return next(err);
+    }
+    res.send({
+      message: "You successfully logged out",
+      status: 200,
+      isAuth: false,
+      isAdmin: false,
+    });
+  });
+});
+
+router.get("/protected-route", isAuth, (req, res) => {
   res.send({
     message: "You are authenticated",
     status: 200,
@@ -54,7 +55,7 @@ router.get("/protected-route", isAuth, (req, res, next) => {
   });
 });
 
-router.get("/login-success", (req, res, next) => {
+router.get("/login-success", (req, res) => {
   res.send({
     message: "You successfully logged in",
     status: 200,
@@ -63,7 +64,7 @@ router.get("/login-success", (req, res, next) => {
   });
 });
 
-router.get("/login-failure", (req, res, next) => {
+router.get("/login-failure", (req, res) => {
   res.send({
     message: "Something went wrong.",
     status: 401,
