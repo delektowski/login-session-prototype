@@ -1,11 +1,10 @@
 const express = require("express");
 const session = require("express-session");
 const passport = require("passport");
-const cors = require('cors')
-const connection = require("./config/database");
+const cors = require("cors");
 const routes = require("./routes");
 
-const MongoStore = require("connect-mongo")(session);
+const SQLiteStore = require("connect-sqlite3")(session);
 
 // Need to require the entire Passport config module so app.js knows about it
 require("./config/passport");
@@ -19,29 +18,26 @@ require("dotenv").config();
 
 const app = express();
 
-app.use(cors({credentials: true, origin: 'http://localhost:3000',}))
+app.use(cors({ credentials: true, origin: "http://localhost:3000" }));
 app.use(express.json());
-app.use(express.urlencoded({extended: true}));
+app.use(express.urlencoded({ extended: true }));
 
 /**
  * -------------- SESSION SETUP ----------------
  */
 
-const sessionStore = new MongoStore({
-    mongooseConnection: connection,
-    collection: "sessions",
-});
+const sessionStore = new SQLiteStore({ db: "sessions.db", dir: "./var/db" });
 
 app.use(
-    session({
-        secret: process.env.SECRET,
-        resave: false,
-        saveUninitialized: true,
-        store: sessionStore,
-        cookie: {
-            maxAge: 1000 * 60 * 60 * 24,
-        },
-    })
+  session({
+    secret: process.env.SECRET,
+    resave: false,
+    saveUninitialized: true,
+    store: sessionStore,
+    cookie: {
+      maxAge: 1000 * 60 * 60 * 24,
+    },
+  })
 );
 
 /**
@@ -52,8 +48,8 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.use((req, res, next) => {
-    res.header("Access-Control-Allow-Credentials", "true")
-    next();
+  res.header("Access-Control-Allow-Credentials", "true");
+  next();
 });
 
 /**
@@ -63,11 +59,6 @@ app.use((req, res, next) => {
 // Imports all of the routes from ./routes/index.js
 app.use(routes);
 
-/**
- * -------------- SERVER ----------------
- */
-
-// Server listens on http://localhost:3000
-app.listen(8000, (req, res) => {
-    console.log(`App listening on port 8000!`);
+app.listen(8000, () => {
+  console.log(`App listening on port 8000!`);
 });

@@ -5,7 +5,7 @@ import useLogout from "../../hooks/useLogout";
 const Logout = () => {
   const auth = useContext(authContext);
 
-  useLogout(auth.setAuthenticated);
+  useLogout(auth.setAuthenticated, auth.authenticated);
 
   return (
     <div>

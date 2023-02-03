@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Navigate, Route, Routes } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 import "../src/App.css";
 import Login from "./components/login/Login";
 import NotProtected from "./components/notProtected/NotProtected";
@@ -14,7 +14,6 @@ import Register from "./components/register/register";
 
 function App() {
   const [authenticated, setAuthenticated] = useState(false);
-
   useAuth(setAuthenticated);
 
   return (
@@ -23,11 +22,11 @@ function App() {
         <NavBar />
 
         <Routes>
-          <Route path="/" element={<Navigate to="login" />} />
+          <Route path="/" element={<Login />} />
+          <Route path="login" element={<Login />} />
           <Route element={<ProtectedRoute />}>
             <Route path="protected" element={<Protected />} />
           </Route>
-          <Route path="login" element={<Login />} />
           <Route path="register" element={<Register />} />
           <Route path="not-protected" element={<NotProtected />} />
           <Route path="logout" element={<Logout />} />
