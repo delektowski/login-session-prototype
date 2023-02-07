@@ -1,6 +1,8 @@
-const crypto = require("crypto");
+import crypto from "crypto";
 
-function genPassword(password, user) {
+export function genPassword(
+  password: string
+): { salt: string; hash: string } {
   const salt = crypto.randomBytes(32).toString("hex");
   const genHash = crypto
     .pbkdf2Sync(password, salt, 10000, 64, "sha512")
@@ -12,12 +14,13 @@ function genPassword(password, user) {
   };
 }
 
-function validPassword(password, hash, salt) {
+export function validPassword(
+  password: string,
+  hash: string,
+  salt: string
+): boolean {
   const genHash = crypto
     .pbkdf2Sync(password, salt, 10000, 64, "sha512")
     .toString("hex");
   return genHash === hash;
 }
-
-module.exports.validPassword = validPassword;
-module.exports.genPassword = genPassword;

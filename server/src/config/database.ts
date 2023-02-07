@@ -1,9 +1,9 @@
-const sqlite3 = require("sqlite3");
-const mkdirp = require("mkdirp");
+import { Database } from "sqlite3";
+import mkdirp from "mkdirp";
+
+const db = new Database("./var/db/users.db");
 
 mkdirp.sync("/var/db");
-
-const db = new sqlite3.Database("./var/db/todos.db");
 
 db.serialize(() => {
   db.run(
