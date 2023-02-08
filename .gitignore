@@ -17,7 +17,7 @@ client-react/node_modules
 .DS_Store
 .idea/
 .env.local
-.env
+server/.env
 .env.development.local
 .env.test.local
 .env.production.local

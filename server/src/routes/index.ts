@@ -1,9 +1,11 @@
-const router = require("express").Router();
-const passport = require("passport");
-const genPassword = require("../lib/passwordUtils").genPassword;
-const sqlite3 = require("sqlite3");
-const db = new sqlite3.Database("./var/db/todos.db");
-const { isAuth } = require("./authMiddleware");
+import express from "express";
+import passport from "passport";
+import {Database} from "sqlite3";
+import {isAuth} from "./authMiddleware";
+import {genPassword} from "../lib/passwordUtils"
+
+const router = express.Router();
+const db = new Database("./var/db/users.db");
 
 router.post(
   "/login",
@@ -73,4 +75,4 @@ router.get("/login-failure", (req, res) => {
   });
 });
 
-module.exports = router;
+export default router;

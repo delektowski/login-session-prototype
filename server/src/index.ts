@@ -1,20 +1,21 @@
-const express = require("express");
-const session = require("express-session");
-const passport = require("passport");
-const cors = require("cors");
-const routes = require("./routes");
-
-const SQLiteStore = require("connect-sqlite3")(session);
+import express, { NextFunction, Request, Response } from "express";
+import session from "express-session";
+import passport from "passport";
+import cors from "cors";
+import routes from "./routes";
+import * as dotenv from "dotenv";
 
 // Need to require the entire Passport config module so app.js knows about it
-require("./config/passport");
+import "./config/passport";
 
+dotenv.config();
+
+const SQLiteStore = require("connect-sqlite3")(session);
 /**
  * -------------- GENERAL SETUP ----------------
  */
 
 // Gives us access to variables set in the .env file via `process.env.VARIABLE_NAME` syntax
-require("dotenv").config();
 
 const app = express();
 
@@ -30,7 +31,7 @@ const sessionStore = new SQLiteStore({ db: "sessions.db", dir: "./var/db" });
 
 app.use(
   session({
-    secret: process.env.SECRET,
+    secret: process.env.SECRET || "",
     resave: false,
     saveUninitialized: true,
     store: sessionStore,
@@ -47,7 +48,7 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.use((req, res, next) => {
+app.use((req: Request, res: Response, next: NextFunction) => {
   res.header("Access-Control-Allow-Credentials", "true");
   next();
 });
@@ -56,7 +57,7 @@ app.use((req, res, next) => {
  * -------------- ROUTES ----------------
  */
 
-// Imports all of the routes from ./routes/index.js
+// Imports all of the routes from ./routes/app.js
 app.use(routes);
 
 app.listen(8000, () => {
