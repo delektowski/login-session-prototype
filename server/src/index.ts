@@ -4,6 +4,7 @@ import passport from "passport";
 import cors from "cors";
 import routes from "./routes";
 import * as dotenv from "dotenv";
+import cookieParser from 'cookie-parser';
 
 // Need to require the entire Passport config module so app.js knows about it
 import "./config/passport";
@@ -20,6 +21,7 @@ const SQLiteStore = require("connect-sqlite3")(session);
 const app = express();
 
 app.use(cors({ credentials: true, origin: "http://localhost:3000" }));
+app.use(cookieParser())
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -60,6 +62,6 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 // Imports all of the routes from ./routes/app.js
 app.use(routes);
 
-app.listen(8000, () => {
+app.listen(8000,'127.0.0.1', () => {
   console.log(`App listening on port 8000!`);
 });

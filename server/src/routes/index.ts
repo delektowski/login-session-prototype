@@ -58,6 +58,7 @@ router.get("/protected-route", isAuth, (req, res) => {
 });
 
 router.get("/login-success", (req, res) => {
+
   res.send({
     message: "You successfully logged in",
     status: 200,
