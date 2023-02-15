@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Route, Routes } from "react-router-dom";
+import authContext from "./contexts/authContext";
 import "../src/App.css";
 import Login from "./components/login/Login";
 import NotProtected from "./components/notProtected/NotProtected";
@@ -7,7 +8,6 @@ import NotFound from "./components/notFound/NotFound";
 import ProtectedRoute from "./components/protectedRoute/ProtectedRoute";
 import Protected from "./components/protected/Protected";
 import useAuth from "./hooks/useAuth";
-import authContext from "./contexts/authContext";
 import NavBar from "./components/navBar/navBar";
 import Logout from "./components/logout/logout";
 import Register from "./components/register/register";
@@ -20,7 +20,6 @@ function App() {
       <>
         <authContext.Provider value={{ authenticated, setAuthenticated }}>
           <NavBar />
-
           <Routes>
             <Route path="/" element={<Login />} />
             <Route path="login" element={<Login />} />

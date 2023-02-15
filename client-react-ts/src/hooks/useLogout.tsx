@@ -2,7 +2,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 
-const useLogout = (setAuthenticated: { (value: boolean): void; (arg0: boolean): void; }, authenticated: unknown) => {
+const useLogout = (setAuthenticated: { (value: boolean): void }, authenticated: boolean) => {
   let navigate = useNavigate();
 
   useEffect(() => {
@@ -12,7 +12,7 @@ const useLogout = (setAuthenticated: { (value: boolean): void; (arg0: boolean): 
   }, [authenticated,navigate]);
 
   axios
-    .get("http://localhost:8000/logout", { withCredentials: true })
+    .get<void>("http://localhost:8000/logout", { withCredentials: true })
     .then(() => {
       setAuthenticated(false);
     })
